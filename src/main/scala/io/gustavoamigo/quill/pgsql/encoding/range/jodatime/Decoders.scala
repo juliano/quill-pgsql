@@ -2,7 +2,7 @@ package io.gustavoamigo.quill.pgsql.encoding.range.jodatime
 
 import io.getquill.source.jdbc.JdbcSource
 import io.gustavoamigo.quill.pgsql.encoding.GenericDecoder
-import org.joda.time.LocalDateTime
+import org.joda.time.{LocalDateTime, DateTime}
 
 trait Decoders extends GenericDecoder {
   this: JdbcSource[_, _] =>
@@ -17,4 +17,5 @@ trait Decoders extends GenericDecoder {
   })
 
   implicit val localDateTimeTupleDecoder: Decoder[(LocalDateTime, LocalDateTime)] = decoder(LocalDateTime.parse(_, dateTimeFormatter))
+  implicit val dateTimeTupleDecoder: Decoder[(DateTime, DateTime)] = decoder(DateTime.parse(_, timeZoneDateTimeFormatter))
 }
