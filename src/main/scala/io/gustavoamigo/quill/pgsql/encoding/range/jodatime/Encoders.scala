@@ -3,7 +3,7 @@ package io.gustavoamigo.quill.pgsql.encoding.range.jodatime
 import java.sql.{Types, PreparedStatement}
 
 import io.getquill.source.jdbc.JdbcSource
-import org.joda.time.{LocalDateTime, DateTime}
+import org.joda.time.{LocalDate, LocalDateTime, DateTime}
 
 trait Encoders {
   this: JdbcSource[_, _] =>
@@ -20,8 +20,9 @@ trait Encoders {
     }
   }
 
-  private def tuple[T](t: (T, T))(valToStr: T => String) = s"[${valToStr(t._1)}, ${valToStr(t._2)}]"
+  private def tuple[T](t: (T, T))(valToStr: T => String) = s"[${valToStr(t._1)}, ${valToStr(t._2)})"
 
   implicit val localDateTimeTupleEncoder: Encoder[(LocalDateTime, LocalDateTime)] = genericEncoder(tuple(_)(_.toString(dateTimeFormatter)))
   implicit val dateTimeTupleEncoder: Encoder[(DateTime, DateTime)] = genericEncoder(tuple(_)(_.toString(timeZoneDateTimeFormatter)))
+  implicit val localDateTupleEncoder: Encoder[(LocalDate, LocalDate)] = genericEncoder(tuple(_)(_.toString(dateFormatter)))
 }

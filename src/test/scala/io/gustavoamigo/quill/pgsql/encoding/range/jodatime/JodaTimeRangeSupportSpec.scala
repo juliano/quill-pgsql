@@ -3,7 +3,7 @@ package io.gustavoamigo.quill.pgsql.encoding.range.jodatime
 import io.getquill._
 import io.getquill.naming.CamelCase
 import io.gustavoamigo.quill.pgsql.PostgresJdbcSource
-import org.joda.time.{LocalDateTime, DateTime}
+import org.joda.time.{LocalDate, LocalDateTime, DateTime}
 import org.specs2.mutable.Specification
 import org.specs2.specification.BeforeAll
 
@@ -27,6 +27,8 @@ class JodaTimeRangeSupportSpec extends Specification with BeforeAll {
   case class EncodeLocalDateTimeTuple(name: String, tsr: (LocalDateTime, LocalDateTime))
 
   case class EncodeDateTimeTuple(name: String, tstzr: (DateTime, DateTime))
+
+  case class EncodeLocalDateTuple(name: String, dr: (LocalDate, LocalDate))
 
   "Tuple (LocalDateTime, LocalDateTime) mapped to TSRANGE" should {
     "just work" in {
@@ -53,6 +55,20 @@ class JodaTimeRangeSupportSpec extends Specification with BeforeAll {
       db.run(insert)(List(EncodeDateTimeTuple("test2", (now, tomorrow))))
       val found = db.run(select)
       found.head.tstzr.toString must beEqualTo((now, tomorrow).toString)
+    }
+  }
+
+  "Tuple (LocalDate, LocalDate) mapped to DATERANGE" should {
+    "just work" in {
+      val encodeLocalDateTuple = quote(query[EncodeLocalDateTuple]("EncodeRange"))
+      val now = LocalDate.now
+      val tomorrow = LocalDate.now().plusDays(1)
+
+      val insert = quote(encodeLocalDateTuple.insert)
+      val select = quote(encodeLocalDateTuple.filter(_.name == "test3"))
+      db.run(insert)(List(EncodeLocalDateTuple("test3", (now, tomorrow))))
+      val found = db.run(select)
+      found.head.dr.toString must beEqualTo((now, tomorrow).toString)
     }
   }
 }
