@@ -1,25 +1,18 @@
 package io.gustavoamigo.quill.pgsql.encoding.range.datetime
 
-import java.time.{LocalDate, ZonedDateTime, LocalDateTime}
+import java.time.{LocalDate, LocalDateTime, ZonedDateTime}
 import java.util.Date
 
 import io.getquill.source.jdbc.JdbcSource
-import io.gustavoamigo.quill.pgsql.encoding.GenericDecoder
+import io.gustavoamigo.quill.pgsql.encoding.range.DateRangeDecoder
 
-trait Decoders extends GenericDecoder {
+trait Decoders extends DateRangeDecoder {
   this: JdbcSource[_, _] =>
 
   import Formatters._
 
-  private val rangePattern = """([0-9\-\+\. :]+)""".r
-
-  private def decoder[T](map: String => T) = decode(s => {
-    val dates = rangePattern.findAllIn(s).toList
-    (map(dates.head), map(dates.last))
-  })
-
-  implicit val dateTupleDecoder: Decoder[(Date, Date)] = decoder(parseDate)
-  implicit val localDateTimeTupleDecoder: Decoder[(LocalDateTime, LocalDateTime)] = decoder(parseLocalDateTime)
-  implicit val zonedDateTimeTupleDecoder: Decoder[(ZonedDateTime, ZonedDateTime)] = decoder(parseZonedDateTime)
-  implicit val localDateTupleDecoder: Decoder[(LocalDate, LocalDate)] = decoder(parseLocalDate)
+  implicit val dateTupleDecoder: Decoder[(Date, Date)] = decodeRange(parseDate)
+  implicit val localDateTimeTupleDecoder: Decoder[(LocalDateTime, LocalDateTime)] = decodeRange(parseLocalDateTime)
+  implicit val zonedDateTimeTupleDecoder: Decoder[(ZonedDateTime, ZonedDateTime)] = decodeRange(parseZonedDateTime)
+  implicit val localDateTupleDecoder: Decoder[(LocalDate, LocalDate)] = decodeRange(parseLocalDate)
 }

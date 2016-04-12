@@ -1,22 +1,15 @@
 package io.gustavoamigo.quill.pgsql.encoding.range.jodatime
 
 import io.getquill.source.jdbc.JdbcSource
-import io.gustavoamigo.quill.pgsql.encoding.GenericDecoder
-import org.joda.time.{LocalDate, LocalDateTime, DateTime}
+import io.gustavoamigo.quill.pgsql.encoding.range.DateRangeDecoder
+import org.joda.time.{DateTime, LocalDate, LocalDateTime}
 
-trait Decoders extends GenericDecoder {
+trait Decoders extends DateRangeDecoder {
   this: JdbcSource[_, _] =>
 
   import Formatters._
 
-  private val rangePattern = """([0-9\-\+\. :]+)""".r
-
-  private def decoder[T](map: String => T) = decode(s => {
-    val dates = rangePattern.findAllIn(s).toList
-    (map(dates.head), map(dates.last))
-  })
-
-  implicit val localDateTimeTupleDecoder: Decoder[(LocalDateTime, LocalDateTime)] = decoder(LocalDateTime.parse(_, dateTimeFormatter))
-  implicit val dateTimeTupleDecoder: Decoder[(DateTime, DateTime)] = decoder(DateTime.parse(_, timeZoneDateTimeFormatter))
-  implicit val localDateTupleDecoder: Decoder[(LocalDate, LocalDate)] = decoder(LocalDate.parse(_, dateFormatter))
+  implicit val localDateTimeTupleDecoder: Decoder[(LocalDateTime, LocalDateTime)] = decodeRange(LocalDateTime.parse(_, dateTimeFormatter))
+  implicit val dateTimeTupleDecoder: Decoder[(DateTime, DateTime)] = decodeRange(DateTime.parse(_, timeZoneDateTimeFormatter))
+  implicit val localDateTupleDecoder: Decoder[(LocalDate, LocalDate)] = decodeRange(LocalDate.parse(_, dateFormatter))
 }
